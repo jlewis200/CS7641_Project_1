@@ -4,50 +4,45 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-from dataset_utils import get_normalized_data
-from get_parameters import get_dt_params
-from get_parameters import get_adaboost_params
-from get_parameters import get_neuralnet_params
-from get_parameters import get_knn_params
-from get_parameters import get_svm_params
-from get_parameters import evaluate_params
-from sklearn import svm
+from time import time
+from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import f1_score
 
-from time import time
-
+#local project packages
+from dataset_utils import get_normalized_data, filename_se, filename_ho, SEED
+from parameter_utils import get_params_se, get_params_ho, evaluate_params
 
 def main():
-    get_dataset1_best_params()
-    # get_dataset2_best_params()
-    # plot_accuracy_vs_training_ratio_dataset1()
-    # plot_accuracy_vs_training_ratio_dataset2()
 
-    # plot_dt_accuracy_vs_ccp()
-    # plot_ada_accuracy_vs_ccp()
-    # plot_nnt_accuracy_vs_iter()
-    # plot_knn_accuracy_vs_k()
-    # plot_SVM_accuracy_vs_kernel()
+    # print(get_params_se())
+    print(get_params_ho())
+    # plot_accuracy_se()
+    # plot_accuracy_ho()
 
-def plot_SVM_accuracy_vs_kernel():
+    # plot_dtr_accuracy()
+    # plot_ada_accuracy()
+    # plot_nnt_accuracy()
+    # plot_knn_accuracy()
+    # plot_SVM_accuracy()
+
+def plot_SVM_accuracy():
     svm_params = {
         'C': 1.5,
         'class_weight': 'balanced',
         'degree': 1,
         'gamma': 'scale',
-        'random_state': 903539276}
+        'random_state': SEED}
 
     ratios = [i/100 for i in range(5, 100, 5)]
     ratios.insert(0, 0.03)
     ratios.insert(0, 0.01)
     ratios.append(0.99)
 
-    files = ["datasets/Semeion/semeion.csv" ,"datasets/Letter-Recognition/letter-recognition.data"]
+    files = [filename_se ,filename_ho]
     fig, ax = plt.subplots(len(files), sharex=True, sharey=True, gridspec_kw={'hspace': 0.12})
     for i in range(len(files)):
         n_samples = []
@@ -64,19 +59,19 @@ def plot_SVM_accuracy_vs_kernel():
             data = get_normalized_data(files[i], ratio)
             n_samples.append(data[0].shape[0])
 
-            res = evaluate_params(svm.SVC(**svm_params, kernel='linear'), *data)
+            res = evaluate_params(SVC(**svm_params, kernel='linear'), *data)
             lin_is.append(res[1])
             lin_os.append(res[3])
 
-            res = evaluate_params(svm.SVC(**svm_params, kernel='poly'), *data)
+            res = evaluate_params(SVC(**svm_params, kernel='poly'), *data)
             pol_is.append(res[1])
             pol_os.append(res[3])
 
-            res = evaluate_params(svm.SVC(**svm_params, kernel='rbf'), *data)
+            res = evaluate_params(SVC(**svm_params, kernel='rbf'), *data)
             rbf_is.append(res[1])
             rbf_os.append(res[3])
 
-            res = evaluate_params(svm.SVC(C=3.43, kernel='sigmoid', gamma=1/72, class_weight=None, random_state=903539276), *data)
+            res = evaluate_params(SVC(C=3.43, kernel='sigmoid', gamma=1/72, class_weight=None, random_state=SEED), *data)
             sig_is.append(res[1])
             sig_os.append(res[3])
 
@@ -97,10 +92,10 @@ def plot_SVM_accuracy_vs_kernel():
     fig.set_size_inches(12, 8)
     plt.savefig("SVM_performance.png")
 
-def plot_knn_accuracy_vs_k():
+def plot_knn_accuracy():
     data = list()
-    data.append(get_normalized_data("datasets/Semeion/semeion.csv", 0.5))
-    data.append(get_normalized_data("datasets/Letter-Recognition/letter-recognition.data", 0.5))
+    data.append(get_normalized_data(filename_se, 0.5))
+    data.append(get_normalized_data(filename_ho, 0.5))
 
     fig, ax = plt.subplots(len(data), sharex=True, sharey=True, gridspec_kw={'hspace': 0.12})
 
@@ -139,19 +134,19 @@ def plot_knn_accuracy_vs_k():
     fig.set_size_inches(12, 8)
     plt.savefig("KNN_performance.png")
 
-def plot_nnt_accuracy_vs_iter():
+def plot_nnt_accuracy():
     nnt_params = {
         'activation': 'logistic',
         'hidden_layer_sizes': (30,),
         'learning_rate': 'constant',
         'max_iter': 10,
-        'random_state': 903539276,
+        'random_state': SEED,
         'warm_start': True} #warm_start combined with max_iter lets us train 10 iterations, check performance, and continue training where we left off
 
 
     data = list()
-    data.append(get_normalized_data("datasets/Semeion/semeion.csv", 0.5))
-    data.append(get_normalized_data("datasets/Letter-Recognition/letter-recognition.data", 0.5))
+    data.append(get_normalized_data(filename_se, 0.5))
+    data.append(get_normalized_data(filename_ho, 0.5))
 
     fig, ax = plt.subplots(len(data), sharex=True, sharey=True, gridspec_kw={'hspace': 0.12})
 
@@ -192,10 +187,10 @@ def plot_nnt_accuracy_vs_iter():
     fig.set_size_inches(12, 8)
     plt.savefig("NN_performance.png")
 
-def plot_ada_accuracy_vs_ccp():
+def plot_ada_accuracy():
     data = list()
-    data.append(get_normalized_data("datasets/Semeion/semeion.csv", 0.5))
-    data.append(get_normalized_data("datasets/Letter-Recognition/letter-recognition.data", 0.5))
+    data.append(get_normalized_data(filename_se, 0.5))
+    data.append(get_normalized_data(filename_ho, 0.5))
 
     fig, ax = plt.subplots(len(data), sharex=True, sharey=True, gridspec_kw={'hspace': 0.12})
 
@@ -209,14 +204,14 @@ def plot_ada_accuracy_vs_ccp():
                 'ccp_alpha': ccp,
                 'class_weight': 'balanced',
                 'criterion': 'entropy',
-                'random_state': 903539276}
+                'random_state': SEED}
 
             adaboost_params = {
                 'algorithm': 'SAMME.R',
                 'base_estimator': DecisionTreeClassifier(**dt_params),
                 'learning_rate': 0.6,
                 'n_estimators': 59,
-                'random_state': 903539276}
+                'random_state': SEED}
 
             res = evaluate_params(AdaBoostClassifier(**adaboost_params), *data[i])
             ada_is.append(res[1])
@@ -239,10 +234,10 @@ def plot_ada_accuracy_vs_ccp():
     fig.set_size_inches(12, 8)
     plt.savefig("ADA_performance.png")
 
-def plot_dt_accuracy_vs_ccp():
+def plot_dtr_accuracy():
     data = list()
-    data.append(get_normalized_data("datasets/Semeion/semeion.csv", 0.5))
-    data.append(get_normalized_data("datasets/Letter-Recognition/letter-recognition.data", 0.5))
+    data.append(get_normalized_data(filename_se, 0.5))
+    data.append(get_normalized_data(filename_ho, 0.5))
 
     fig, ax = plt.subplots(len(data), sharex=True, gridspec_kw={'hspace': 0.12})
 
@@ -256,7 +251,7 @@ def plot_dt_accuracy_vs_ccp():
                 'ccp_alpha': ccp,
                 'class_weight': 'balanced',
                 'criterion': 'entropy',
-                'random_state': 903539276}
+                'random_state': SEED}
 
             res = evaluate_params(DecisionTreeClassifier(**dt_params), *data[i])
             dtr_is.append(res[1])
@@ -282,30 +277,30 @@ def plot_dt_accuracy_vs_ccp():
     plt.savefig("DT_performance.png")
 
 
-def plot_accuracy_vs_training_ratio_dataset1():
+def plot_accuracy_se():
     pass
 
-def plot_accuracy_vs_training_ratio_dataset2():
+def plot_accuracy_ho():
     ### dataset1 with 0.5 train/test ratio
     dt_params = {
         'ccp_alpha': 0.0,
         'class_weight': 'balanced',
         'criterion': 'entropy',
-        'random_state': 903539276}
+        'random_state': SEED}
 
     adaboost_params = {
         'algorithm': 'SAMME.R',
-        'base_estimator': DecisionTreeClassifier(ccp_alpha=0.02, class_weight='balanced', criterion='entropy', random_state=903539276),
+        'base_estimator': DecisionTreeClassifier(ccp_alpha=0.02, class_weight='balanced', criterion='entropy', random_state=SEED),
         'learning_rate': 0.6,
         'n_estimators': 59,
-        'random_state': 903539276}
+        'random_state': SEED}
 
     neuralnet_params = {
         'activation': 'logistic',
         'hidden_layer_sizes': (30,),
         'learning_rate': 'constant',
         'max_iter': 1000,
-        'random_state': 903539276,
+        'random_state': SEED,
         'solver': 'adam'}
 
     knn_params = {
@@ -322,7 +317,7 @@ def plot_accuracy_vs_training_ratio_dataset2():
         'degree': 1,
         'gamma': 'scale',
         'kernel': 'rbf',
-        'random_state': 903539276}
+        'random_state': SEED}
 
     #In-Sample performance was 1.0 for all except Decision Tree.  It started close to 1.0 and and declined past 0.8 as the train ratio increased
     ratios = [i/100 for i in range(5, 100, 5)]
@@ -352,7 +347,7 @@ def plot_accuracy_vs_training_ratio_dataset2():
     svm_it = []
 
     for ratio in ratios:
-        data = get_normalized_data("datasets/Letter-Recognition/letter-recognition.data", ratio)
+        data = get_normalized_data(filename_ho, ratio)
         n_samples.append(data[0].shape[0])
 
         res = evaluate_params(DecisionTreeClassifier(**dt_params), *data)
@@ -379,7 +374,7 @@ def plot_accuracy_vs_training_ratio_dataset2():
         knn_tt.append(res[4])
         knn_it.append(res[5])
 
-        res = evaluate_params(svm.SVC(**svm_params), *data)
+        res = evaluate_params(SVC(**svm_params), *data)
         svm_is.append(res[1])
         svm_os.append(res[3])
         svm_tt.append(res[4])
@@ -430,61 +425,7 @@ def plot_accuracy_vs_training_ratio_dataset2():
     fig.set_size_inches(12, 8)
     plt.savefig("LR_infer_time.png")
 
-def get_dataset1_best_params():
-    data = get_normalized_data("datasets/Semeion/semeion.csv", 0.5)
 
-    ### DecisionTreeClassifier
-    dt_params = get_dt_params(*data)
-    print("DecisionTreeClassifier best parameters:  " + str(dt_params))
-    evaluate_params(DecisionTreeClassifier(**dt_params), *data, True)
-
-    ### AdaBoostClassifier with more pruned Decision Tree learner
-    adaboost_params = get_adaboost_params(*data)
-    print("AdaBoostClassifier best parameters:  " + str(adaboost_params))
-    evaluate_params(AdaBoostClassifier(**adaboost_params), *data, True)
-
-    ### MLPClassifier
-    neuralnet_params = get_neuralnet_params(*data)
-    print("MLPClassifier best parameters:  " + str(neuralnet_params))
-    evaluate_params(MLPClassifier(**neuralnet_params), *data, True)
-
-    ### KNeighborsClassifier
-    knn_params = get_knn_params(*data)
-    print("KNeighborsClassifier best parameters:  " + str(knn_params))
-    evaluate_params(KNeighborsClassifier(**knn_params), *data, True)
-
-    ### KNeighborsClassifier
-    svm_params = get_svm_params(*data)
-    print("svm.SVC() best parameters:  " + str(svm_params))
-    evaluate_params(svm.SVC(**svm_params), *data, True)
-
-def get_dataset2_best_params():
-    data = get_normalized_data("datasets/Letter-Recognition/letter-recognition.data", 0.5)
-
-    ### DecisionTreeClassifier
-    dt_params = get_dt_params(*data)
-    print("DecisionTreeClassifier best parameters:  " + str(dt_params))
-    evaluate_params(DecisionTreeClassifier(**dt_params), *data, True)
-
-    ### AdaBoostClassifier with more pruned Decision Tree learner
-    adaboost_params = get_adaboost_params(*data, dt_params)
-    print("AdaBoostClassifier best parameters:  " + str(adaboost_params))
-    evaluate_params(AdaBoostClassifier(**adaboost_params), *data, True)
-
-    ### MLPClassifier
-    neuralnet_params = get_neuralnet_params(*data)
-    print("MLPClassifier best parameters:  " + str(neuralnet_params))
-    evaluate_params(MLPClassifier(**neuralnet_params), *data, True)
-
-    ### KNeighborsClassifier
-    knn_params = get_knn_params(*data)
-    print("KNeighborsClassifier best parameters:  " + str(knn_params))
-    evaluate_params(KNeighborsClassifier(**knn_params), *data, True)
-
-    ### KNeighborsClassifier
-    svm_params = get_svm_params(*data)
-    print("svm.SVC() best parameters:  " + str(svm_params))
-    evaluate_params(svm.SVC(**svm_params), *data, True)
 
 
 if "__main__" == __name__:
