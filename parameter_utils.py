@@ -172,7 +172,7 @@ def get_params_se():
     param_grid = {
         'C': [2*10**i for i in range(-5, 6)],
         'kernel': ['poly'],
-        'degree': [1, 2, 3],
+        'degree': [1],
         'gamma': [2*10**i for i in range(-5, 6)],
         'class_weight': ['balanced', None],
         'random_state': [SEED]}
@@ -336,10 +336,10 @@ def get_params_ho():
 
     ## kernel: poly
     param_grid = {
-        'C': [10**i for i in range(-3, 4)],#[i/10 for i in range(5, 81, 5)],
+        'C': [i/10 for i in range(5, 81, 5)],
         'kernel': ['poly'],
-        'degree': [1, 2, 3],
-        'gamma': [10**i for i in range(-3, 4)],#[1/i for i in range(5, 100, 5)],#['scale'],
+        'degree': [1],
+        'gamma': [1/i for i in range(5, 100, 5)],#['scale'],
         'class_weight': ['balanced', None],
         'random_state': [SEED]}
 
