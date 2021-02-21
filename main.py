@@ -21,10 +21,12 @@ def main():
     # plot_accuracy_ho() includes a time-based test.  It should be run by itself
     # to reduce the effect of CPU load on the results.  The system should be
     # loaded as little as possible.
-    # plot_accuracy_ho()
+    plot_accuracy_ho()
 
-    # Process(target=get_params_se()).start()
-    # Process(target=get_params_ho()).start()
+    plot_accuracy_se()
+    # plot_nnt_accuracy()
+    Process(target=get_params_se).start()
+    Process(target=get_params_ho).start()
     Process(target=plot_accuracy_se).start()
     Process(target=plot_dtr_accuracy).start()
     Process(target=plot_ada_accuracy).start()
