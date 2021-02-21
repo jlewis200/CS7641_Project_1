@@ -30,11 +30,12 @@ os.environ["PYTHONWARNINGS"] = "ignore"
 
 def get_cached_params_se():
     #these parameters were generated using the get_params_se() function
-    return {'dtr_params': {'ccp_alpha': 0.005, 'class_weight': 'balanced', 'criterion': 'gini', 'random_state': 903539276}, 'ada_params': {'algorithm': 'SAMME.R', 'base_estimator': DecisionTreeClassifier(ccp_alpha=0.025, class_weight='balanced', random_state=903539276), 'learning_rate': 0.8, 'n_estimators': 69, 'random_state': 903539276}, 'nnt_params_adm': {'activation': 'logistic', 'hidden_layer_sizes': (30,), 'max_iter': 200, 'random_state': 903539276, 'solver': 'adam'}, 'nnt_params_lbfgs': {'activation': 'relu', 'hidden_layer_sizes': (34,), 'max_iter': 200, 'random_state': 903539276, 'solver': 'lbfgs'}, 'nnt_params_sgd': {'activation': 'relu', 'hidden_layer_sizes': (25,), 'learning_rate': 'constant', 'max_iter': 200, 'random_state': 903539276, 'solver': 'sgd'}, 'knn_params': {'algorithm': 'ball_tree', 'leaf_size': 30, 'n_jobs': 14, 'n_neighbors': 6, 'p': 1, 'weights': 'distance'}, 'svm_params_rbf': {'C': 10, 'class_weight': None, 'gamma': 0.001, 'kernel': 'rbf', 'random_state': 903539276}, 'svm_params_sigmoid': {'C': 2000, 'class_weight': 'balanced', 'gamma': 2e-05, 'kernel': 'sigmoid', 'random_state': 903539276}, 'svm_params_poly': {'C': 2e-05, 'class_weight': 'balanced', 'degree': 1, 'gamma': 2000, 'kernel': 'poly', 'random_state': 903539276}, 'svm_params_linear': {'C': 1.0, 'class_weight': 'balanced', 'kernel': 'linear', 'random_state': 903539276}}
+    return {'dtr_params': {'ccp_alpha': 0.005, 'class_weight': 'balanced', 'criterion': 'gini', 'random_state': 903539276}, 'ada_params': {'algorithm': 'SAMME.R', 'base_estimator': DecisionTreeClassifier(ccp_alpha=0.025, class_weight='balanced', random_state=903539276), 'learning_rate': 0.8, 'n_estimators': 69, 'random_state': 903539276}, 'nnt_params_adam': {'activation': 'logistic', 'hidden_layer_sizes': (30,), 'max_iter': 200, 'random_state': 903539276, 'solver': 'adam'}, 'nnt_params_lbfgs': {'activation': 'relu', 'hidden_layer_sizes': (34,), 'max_iter': 200, 'random_state': 903539276, 'solver': 'lbfgs'}, 'nnt_params_sgd': {'activation': 'relu', 'hidden_layer_sizes': (25,), 'learning_rate': 'constant', 'max_iter': 200, 'random_state': 903539276, 'solver': 'sgd'}, 'knn_params': {'algorithm': 'ball_tree', 'leaf_size': 30, 'n_jobs': 14, 'n_neighbors': 6, 'p': 1, 'weights': 'distance'}, 'svm_params_rbf': {'C': 10, 'class_weight': None, 'gamma': 0.001, 'kernel': 'rbf', 'random_state': 903539276}, 'svm_params_sigmoid': {'C': 2000, 'class_weight': 'balanced', 'gamma': 2e-05, 'kernel': 'sigmoid', 'random_state': 903539276}, 'svm_params_poly': {'C': 2e-05, 'class_weight': 'balanced', 'degree': 1, 'gamma': 2000, 'kernel': 'poly', 'random_state': 903539276}, 'svm_params_linear': {'C': 1.0, 'class_weight': 'balanced', 'kernel': 'linear', 'random_state': 903539276}}
 
 def get_cached_params_ho():
     #these parameters were generated using the get_params_ho() function
-    pass
+    return {'dtr_params': {'ccp_alpha': 0.0, 'class_weight': None, 'criterion': 'entropy', 'random_state': 903539276}, 'ada_params': {'algorithm': 'SAMME.R', 'base_estimator': DecisionTreeClassifier(ccp_alpha=0.025, criterion='entropy', random_state=903539276), 'learning_rate': 0.7, 'n_estimators': 100, 'random_state': 903539276}, 'nnt_params_adam': {'activation': 'relu', 'hidden_layer_sizes': (44,), 'max_iter': 200, 'random_state': 903539276, 'solver': 'adam'}, 'nnt_params_lbfgs': {'activation': 'relu', 'hidden_layer_sizes': (48,), 'max_iter': 200, 'random_state': 903539276, 'solver': 'lbfgs'}, 'nnt_params_sgd': {'activation': 'relu', 'hidden_layer_sizes': (28,), 'learning_rate': 'constant', 'max_iter': 200, 'random_state': 903539276, 'solver': 'sgd'}, 'knn_params': {'algorithm': 'ball_tree', 'leaf_size': 30, 'n_jobs': 14, 'p': 1}, 'svm_params_rbf': {'C': 10, 'class_weight': None, 'gamma': 0.1, 'kernel': 'rbf', 'random_state': 903539276}, 'svm_params_sigmoid': {'C': 10000, 'class_weight': None, 'gamma': 0.0001, 'kernel': 'sigmoid', 'random_state': 903539276}, 'svm_params_poly': {'C': 5.5, 'class_weight': None, 'degree': 1, 'gamma': 0.2, 'kernel': 'poly', 'random_state': 903539276}, 'svm_params_linear': {'C': 1, 'class_weight': None, 'kernel': 'linear', 'random_state': 903539276}}
+
 
 def get_params_se():
     params = {}
@@ -85,10 +86,10 @@ def get_params_se():
 
     classifier = GridSearchCV(MLPClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
-    nnt_params_adm = classifier.best_params_
-    params['nnt_params_adm'] = nnt_params_adm
-    print("MLPClassifier solver=adam best parameters:  " + str(nnt_params_adm))
-    evaluate_params(MLPClassifier(**nnt_params_adm), *data, True)
+    nnt_params_adam = classifier.best_params_
+    params['nnt_params_adam'] = nnt_params_adam
+    print("MLPClassifier solver=adam best parameters:  " + str(nnt_params_adam))
+    evaluate_params(MLPClassifier(**nnt_params_adam), *data, True)
 
     ## solver: lbfgs
     param_grid = {
@@ -249,10 +250,10 @@ def get_params_ho():
 
     classifier = GridSearchCV(MLPClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
-    nnt_params_adm = classifier.best_params_
-    params['nnt_params_adm'] = nnt_params_adm
-    print("MLPClassifier solver=adam best parameters:  " + str(nnt_params_adm))
-    evaluate_params(MLPClassifier(**nnt_params_adm), *data, True)
+    nnt_params_adam = classifier.best_params_
+    params['nnt_params_adam'] = nnt_params_adam
+    print("MLPClassifier solver=adam best parameters:  " + str(nnt_params_adam))
+    evaluate_params(MLPClassifier(**nnt_params_adam), *data, True)
 
     ## solver: lbfgs
     param_grid = {

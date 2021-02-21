@@ -11,31 +11,27 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import f1_score
+from multiprocessing import Process
 
 #local project packages
 from dataset_utils import get_normalized_data, filename_se, filename_ho, SEED
-from parameter_utils import get_params_se, get_params_ho, evaluate_params
+from parameter_utils import get_params_se, get_params_ho, get_cached_params_se, get_cached_params_ho, evaluate_params
 
 def main():
 
     # print(get_params_se())
-    print(get_params_ho())
-    # plot_accuracy_se()
-    # plot_accuracy_ho()
+    # print(get_params_ho())
+    plot_accuracy_ho()
 
-    # plot_dtr_accuracy()
-    # plot_ada_accuracy()
-    # plot_nnt_accuracy()
-    # plot_knn_accuracy()
-    # plot_SVM_accuracy()
+    # Process(target=plot_accuracy_se()).start()
+    # Process(target=plot_dtr_accuracy()).start()
+    # Process(target=plot_ada_accuracy()).start()
+    # Process(target=plot_nnt_accuracy()).start()
+    # Process(target=plot_knn_accuracy()).start()
+    # Process(target=plot_SVM_accuracy()).start()
 
 def plot_SVM_accuracy():
-    svm_params = {
-        'C': 1.5,
-        'class_weight': 'balanced',
-        'degree': 1,
-        'gamma': 'scale',
-        'random_state': SEED}
+    params = [get_cached_params_se(), get_cached_params_ho()]
 
     ratios = [i/100 for i in range(5, 100, 5)]
     ratios.insert(0, 0.03)
@@ -59,19 +55,19 @@ def plot_SVM_accuracy():
             data = get_normalized_data(files[i], ratio)
             n_samples.append(data[0].shape[0])
 
-            res = evaluate_params(SVC(**svm_params, kernel='linear'), *data)
+            res = evaluate_params(SVC(**params[i]['svm_params_linear']), *data)
             lin_is.append(res[1])
             lin_os.append(res[3])
 
-            res = evaluate_params(SVC(**svm_params, kernel='poly'), *data)
+            res = evaluate_params(SVC(**params[i]['svm_params_poly']), *data)
             pol_is.append(res[1])
             pol_os.append(res[3])
 
-            res = evaluate_params(SVC(**svm_params, kernel='rbf'), *data)
+            res = evaluate_params(SVC(**params[i]['svm_params_rbf']), *data)
             rbf_is.append(res[1])
             rbf_os.append(res[3])
 
-            res = evaluate_params(SVC(C=3.43, kernel='sigmoid', gamma=1/72, class_weight=None, random_state=SEED), *data)
+            res = evaluate_params(SVC(**params[i]['svm_params_sigmoid']), *data)
             sig_is.append(res[1])
             sig_os.append(res[3])
 
@@ -85,7 +81,7 @@ def plot_SVM_accuracy():
         ax[i].legend(loc='lower right', shadow=True, fontsize='small', facecolor='#d0d0d0')
 
     ax[0].set(ylabel='Mean F1 Score', title='Semeion Dataset')
-    ax[1].set(ylabel='Mean F1 Score', title='Letter Recognition Dataset')
+    ax[1].set(ylabel='Mean F1 Score', title='Holland Dataset')
 
     plt.xlabel('Train/Test Ratio')
     fig.suptitle('SVM Kernel Performance VS Train/Test Ratio')
@@ -93,6 +89,8 @@ def plot_SVM_accuracy():
     plt.savefig("SVM_performance.png")
 
 def plot_knn_accuracy():
+    params = [get_cached_params_se(), get_cached_params_ho()]
+
     data = list()
     data.append(get_normalized_data(filename_se, 0.5))
     data.append(get_normalized_data(filename_ho, 0.5))
@@ -105,13 +103,8 @@ def plot_knn_accuracy():
         knn_os = [] #decision tree out-sample
 
         for n in n_neighbors:
-            knn_params = {
-                'algorithm': 'ball_tree',
-                'leaf_size': 30,
-                'n_jobs': 8,
-                'n_neighbors': n,
-                'p': 1,
-                'weights': 'distance'}
+            knn_params = dict(params[i]['knn_params'])
+            knn_params['n_neighbors'] = n
 
             res = evaluate_params(KNeighborsClassifier(**knn_params), *data[i])
             knn_is.append(res[1])
@@ -127,7 +120,7 @@ def plot_knn_accuracy():
         ax[i].legend(loc='best', shadow=True, fontsize='small', facecolor='#d0d0d0')
 
     ax[0].set(ylabel='Mean F1 Score', title='Semeion Dataset')
-    ax[1].set(ylabel='Mean F1 Score', title='Letter Recognition Dataset')
+    ax[1].set(ylabel='Mean F1 Score', title='Holland Dataset')
 
     plt.xlabel('K Neighbors')
     fig.suptitle('KNN Performance VS K')
@@ -135,14 +128,7 @@ def plot_knn_accuracy():
     plt.savefig("KNN_performance.png")
 
 def plot_nnt_accuracy():
-    nnt_params = {
-        'activation': 'logistic',
-        'hidden_layer_sizes': (30,),
-        'learning_rate': 'constant',
-        'max_iter': 10,
-        'random_state': SEED,
-        'warm_start': True} #warm_start combined with max_iter lets us train 10 iterations, check performance, and continue training where we left off
-
+    params = [get_cached_params_se(), get_cached_params_ho()]
 
     data = list()
     data.append(get_normalized_data(filename_se, 0.5))
@@ -152,13 +138,23 @@ def plot_nnt_accuracy():
 
     iterations = [i for i in range(10, 1001, 10)]
     for i in range(len(data)):
-        nnt_os = [[], [], []] #neural net w/ adam solver out-sample
+        nnt_os = [[], [], []]
         nnts = list()
-        nnt_params['solver'] = 'adam'
+
+        #warm_start combined with max_iter lets us train 10 iterations, check performance, and continue training where we left off
+        nnt_params = dict(params[i]['nnt_params_adam'])
+        nnt_params['max_iter'] = 10
+        nnt_params['warm_start'] = True
         nnts.append(MLPClassifier(**nnt_params))
-        nnt_params['solver'] = 'sgd'
+
+        nnt_params = dict(params[i]['nnt_params_sgd'])
+        nnt_params['max_iter'] = 10
+        nnt_params['warm_start'] = True
         nnts.append(MLPClassifier(**nnt_params))
-        nnt_params['solver'] = 'lbfgs'
+
+        nnt_params = dict(params[i]['nnt_params_lbfgs'])
+        nnt_params['max_iter'] = 10
+        nnt_params['warm_start'] = True
         nnts.append(MLPClassifier(**nnt_params))
 
         for _ in range (100):
@@ -180,7 +176,7 @@ def plot_nnt_accuracy():
         ax[i].legend(loc='best', shadow=True, fontsize='small', facecolor='#d0d0d0')
 
     ax[0].set(ylabel='Mean F1 Score', title='Semeion Dataset')
-    ax[1].set(ylabel='Mean F1 Score', title='Letter Recognition Dataset')
+    ax[1].set(ylabel='Mean F1 Score', title='Holland Dataset')
 
     plt.xlabel('Training Iterations')
     fig.suptitle('Neural Net Solver Performance VS Training Iterations')
@@ -188,6 +184,8 @@ def plot_nnt_accuracy():
     plt.savefig("NN_performance.png")
 
 def plot_ada_accuracy():
+    params = [get_cached_params_se(), get_cached_params_ho()]
+
     data = list()
     data.append(get_normalized_data(filename_se, 0.5))
     data.append(get_normalized_data(filename_ho, 0.5))
@@ -200,20 +198,13 @@ def plot_ada_accuracy():
         ada_os = [] #decision tree out-sample
 
         for ccp in ccps:
-            dt_params = {
-                'ccp_alpha': ccp,
-                'class_weight': 'balanced',
-                'criterion': 'entropy',
-                'random_state': SEED}
+            dtr_params = dict(params[i]['dtr_params'])
+            dtr_params['ccp_alpha'] = ccp
 
-            adaboost_params = {
-                'algorithm': 'SAMME.R',
-                'base_estimator': DecisionTreeClassifier(**dt_params),
-                'learning_rate': 0.6,
-                'n_estimators': 59,
-                'random_state': SEED}
+            ada_params = dict(params[i]['ada_params'])
+            ada_params['base_estimator'] = DecisionTreeClassifier(**dtr_params)
 
-            res = evaluate_params(AdaBoostClassifier(**adaboost_params), *data[i])
+            res = evaluate_params(AdaBoostClassifier(**ada_params), *data[i])
             ada_is.append(res[1])
             ada_os.append(res[3])
 
@@ -227,7 +218,7 @@ def plot_ada_accuracy():
         ax[i].legend(loc='best', shadow=True, fontsize='small', facecolor='#d0d0d0')
 
     ax[0].set(ylabel='Mean F1 Score', title='Semeion Dataset')
-    ax[1].set(ylabel='Mean F1 Score', title='Letter Recognition Dataset')
+    ax[1].set(ylabel='Mean F1 Score', title='Holland Dataset')
 
     plt.xlabel('CCP Parameter')
     fig.suptitle('AdaBoost Performance VS DT Cost Complexity Pruning Parameter')
@@ -235,6 +226,8 @@ def plot_ada_accuracy():
     plt.savefig("ADA_performance.png")
 
 def plot_dtr_accuracy():
+    params = [get_cached_params_se(), get_cached_params_ho()]
+
     data = list()
     data.append(get_normalized_data(filename_se, 0.5))
     data.append(get_normalized_data(filename_ho, 0.5))
@@ -247,17 +240,12 @@ def plot_dtr_accuracy():
         dtr_os = [] #decision tree out-sample
 
         for ccp in ccps:
-            dt_params = {
-                'ccp_alpha': ccp,
-                'class_weight': 'balanced',
-                'criterion': 'entropy',
-                'random_state': SEED}
+            dtr_params = dict(params[i]['dtr_params'])
+            dtr_params['ccp_alpha'] = ccp
 
-            res = evaluate_params(DecisionTreeClassifier(**dt_params), *data[i])
+            res = evaluate_params(DecisionTreeClassifier(**dtr_params), *data[i])
             dtr_is.append(res[1])
             dtr_os.append(res[3])
-
-
 
         ### F1 Score plot
         df_temp = pd.DataFrame([ccps, dtr_os, dtr_is])
@@ -269,7 +257,7 @@ def plot_dtr_accuracy():
         ax[i].legend(loc='lower left', shadow=True, fontsize='small', facecolor='#d0d0d0')
 
     ax[0].set(ylabel='Mean F1 Score', title='Semeion Dataset')
-    ax[1].set(ylabel='Mean F1 Score', title='Letter Recognition Dataset')
+    ax[1].set(ylabel='Mean F1 Score', title='Holland Dataset')
 
     plt.xlabel('CCP Parameter')
     fig.suptitle('Decision Tree Performance VS Cost Complexity Pruning Parameter')
@@ -278,48 +266,66 @@ def plot_dtr_accuracy():
 
 
 def plot_accuracy_se():
-    pass
+    params = get_cached_params_se()
+
+    ratios = [i/100 for i in range(5, 100, 5)]
+    ratios.insert(0, 0.01)
+    ratios.append(0.99)
+    # ratios = [0.01, 0.2]
+    n_samples = []
+    dtr_is = [] #decision tree in-sample
+    ada_is = [] #etc...
+    nnt_is = []
+    knn_is = []
+    svm_is = []
+    dtr_os = [] #decision tree out-sample
+    ada_os = [] #etc...
+    nnt_os = []
+    knn_os = []
+    svm_os = []
+
+    for ratio in ratios:
+        data = get_normalized_data(filename_se, ratio)
+        n_samples.append(data[0].shape[0])
+
+        res = evaluate_params(DecisionTreeClassifier(**params['dtr_params']), *data)
+        dtr_is.append(res[1])
+        dtr_os.append(res[3])
+
+        res = evaluate_params(AdaBoostClassifier(**params['ada_params']), *data)
+        ada_is.append(res[1])
+        ada_os.append(res[3])
+
+        res = evaluate_params(MLPClassifier(**params['nnt_params_lbfgs']), *data)
+        nnt_is.append(res[1])
+        nnt_os.append(res[3])
+
+        res = evaluate_params(KNeighborsClassifier(**params['knn_params']), *data)
+        knn_is.append(res[1])
+        knn_os.append(res[3])
+
+        res = evaluate_params(SVC(**params['svm_params_rbf']), *data)
+        svm_is.append(res[1])
+        svm_os.append(res[3])
+
+    ### F1 Score plot
+    df_temp = pd.DataFrame([ratios, dtr_os, ada_os, nnt_os, knn_os, svm_os, dtr_is, ada_is, nnt_is, knn_is, svm_is])
+    df_temp = df_temp.transpose().set_index(0)#transpose and set column 0 (ratios) as index
+    df_temp.rename(columns={1:'DT Out-Of-Sample', 2:'Adaboost Out-Of-Sample', 3:'Neural Net Out-Of_Sample', 4:'KNN Out-Of-Sample', 5:'SVM Out-Of-Sample', 6:'DT In-Sample', 7:'Adaboost In-Sample', 8:'Neural Net In-Sample',  9:'KNN In-Sample', 10:'SVM In-Sample'}, inplace=True)
+
+    fig, ax = plt.subplots()
+    df_temp.plot(ax=ax, color=['black', 'blue', 'red', 'orange', 'green', 'black', 'blue', 'red', 'orange', 'green'], style=['-', '-', '-', '-', '-', ':', ':', ':', ':', ':'])
+    plt.xlabel('Train/Test Ratio')
+    plt.ylabel('Mean F1 Score')
+    plt.title('Model Performance VS Train/Test Ratio Over Semeion Dataset')
+    plt.legend(loc='best', shadow=True, fontsize='small', facecolor='#d0d0d0')
+    plt.grid(axis='both')
+    fig.set_size_inches(12, 8)
+    plt.savefig("SE_performance.png")
 
 def plot_accuracy_ho():
-    ### dataset1 with 0.5 train/test ratio
-    dt_params = {
-        'ccp_alpha': 0.0,
-        'class_weight': 'balanced',
-        'criterion': 'entropy',
-        'random_state': SEED}
+    params = get_cached_params_ho()
 
-    adaboost_params = {
-        'algorithm': 'SAMME.R',
-        'base_estimator': DecisionTreeClassifier(ccp_alpha=0.02, class_weight='balanced', criterion='entropy', random_state=SEED),
-        'learning_rate': 0.6,
-        'n_estimators': 59,
-        'random_state': SEED}
-
-    neuralnet_params = {
-        'activation': 'logistic',
-        'hidden_layer_sizes': (30,),
-        'learning_rate': 'constant',
-        'max_iter': 1000,
-        'random_state': SEED,
-        'solver': 'adam'}
-
-    knn_params = {
-        'algorithm': 'ball_tree',
-        'leaf_size': 1,
-        'n_jobs': 8,
-        'n_neighbors': 6,
-        'p': 1,
-        'weights': 'distance'}
-
-    svm_params = {
-        'C': 1.5,
-        'class_weight': 'balanced',
-        'degree': 1,
-        'gamma': 'scale',
-        'kernel': 'rbf',
-        'random_state': SEED}
-
-    #In-Sample performance was 1.0 for all except Decision Tree.  It started close to 1.0 and and declined past 0.8 as the train ratio increased
     ratios = [i/100 for i in range(5, 100, 5)]
     ratios.insert(0, 0.01)
     ratios.append(0.99)
@@ -350,31 +356,31 @@ def plot_accuracy_ho():
         data = get_normalized_data(filename_ho, ratio)
         n_samples.append(data[0].shape[0])
 
-        res = evaluate_params(DecisionTreeClassifier(**dt_params), *data)
+        res = evaluate_params(DecisionTreeClassifier(**params['dtr_params']), *data)
         dtr_is.append(res[1])
         dtr_os.append(res[3])
         dtr_tt.append(res[4])
         dtr_it.append(res[5])
 
-        res = evaluate_params(AdaBoostClassifier(**adaboost_params), *data)
+        res = evaluate_params(AdaBoostClassifier(**params['ada_params']), *data)
         ada_is.append(res[1])
         ada_os.append(res[3])
         ada_tt.append(res[4])
         ada_it.append(res[5])
 
-        res = evaluate_params(MLPClassifier(**neuralnet_params), *data)
+        res = evaluate_params(MLPClassifier(**params['nnt_params_lbfgs']), *data)
         nnt_is.append(res[1])
         nnt_os.append(res[3])
         nnt_tt.append(res[4])
         nnt_it.append(res[5])
 
-        res = evaluate_params(KNeighborsClassifier(**knn_params), *data)
+        res = evaluate_params(KNeighborsClassifier(**params['knn_params']), *data)
         knn_is.append(res[1])
         knn_os.append(res[3])
         knn_tt.append(res[4])
         knn_it.append(res[5])
 
-        res = evaluate_params(SVC(**svm_params), *data)
+        res = evaluate_params(SVC(**params['svm_params_rbf']), *data)
         svm_is.append(res[1])
         svm_os.append(res[3])
         svm_tt.append(res[4])
@@ -389,41 +395,40 @@ def plot_accuracy_ho():
     df_temp.plot(ax=ax, color=['black', 'blue', 'red', 'orange', 'green', 'black', 'blue', 'red', 'orange', 'green'], style=['-', '-', '-', '-', '-', ':', ':', ':', ':', ':'])
     plt.xlabel('Train/Test Ratio')
     plt.ylabel('Mean F1 Score')
-    plt.title('"Letter Recognition Data Set" Performance VS Train/Test Ratio')
+    plt.title('Model Performance VS Train/Test Ratio Over Holland Dataset')
     plt.legend(loc='best', shadow=True, fontsize='small', facecolor='#d0d0d0')
     plt.grid(axis='both')
     fig.set_size_inches(12, 8)
-    plt.savefig("LR_performance.png")
+    plt.savefig("HO_performance.png")
 
     ### Train/Infer Time plot
-    df_temp = pd.DataFrame([n_samples, dtr_tt, ada_tt, nnt_tt, knn_tt, svm_tt, dtr_it, ada_it, nnt_it, knn_it, svm_it])
+    fig, ax = plt.subplots(2, sharex=True, gridspec_kw={'hspace': 0.12})
+
+    ## Train time
+    df_temp = pd.DataFrame([n_samples, dtr_tt, ada_tt, nnt_tt, knn_tt, svm_tt])
     df_temp = df_temp.transpose().set_index(0)#transpose and set column 0 (ratios) as index
-    df_temp.rename(columns={1:'DT Train-Time', 2:'Adaboost Train-Time', 3:'Neural Net Train-Time', 4:'KNN Train-Time', 5:'SVM Train-Time', 6:'DT Infer-Time', 7:'Adaboost Infer-Time', 8:'Neural Net Infer-Time', 9:'KNN Infer-Time', 10:'SVM Infer-Time'}, inplace=True)
+    df_temp.rename(columns={1:'DT Train-Time', 2:'Adaboost Train-Time', 3:'Neural Net Train-Time', 4:'KNN Train-Time', 5:'SVM Train-Time'}, inplace=True)
 
-    fig, ax = plt.subplots()
-    df_temp.plot(ax=ax, color=['black', 'blue', 'red', 'orange', 'green', 'black', 'blue', 'red', 'orange', 'green'], style=['-', '-', '-', '-', '-', ':', ':', ':', ':', ':'])
-    plt.xlabel('Sample Size')
-    plt.ylabel('Time in milliseconds')
-    plt.title('"Letter Recognition Data Set" Training & Inference Time VS Sample Size')
-    plt.legend(loc='best', shadow=True, fontsize='small', facecolor='#d0d0d0')
-    plt.grid(axis='both')
-    fig.set_size_inches(12, 8)
-    plt.savefig("LR_train_infer_time.png")
+    df_temp.plot(ax=ax[0], color=['black', 'blue', 'red', 'orange', 'green'])
+    ax[0].grid(axis='both')
+    ax[0].legend(loc='best', shadow=True, fontsize='small', facecolor='#d0d0d0')
+    ax[0].set(ylabel='Time (milliseconds)', title='Train Time')
 
-    ### Infer-Only Time plot
+    ### Infer time
     df_temp = pd.DataFrame([n_samples, dtr_it, ada_it, nnt_it, knn_it, svm_it])
     df_temp = df_temp.transpose().set_index(0)#transpose and set column 0 (ratios) as index
     df_temp.rename(columns={1:'DT Infer-Time', 2:'Adaboost Infer-Time', 3:'Neural Net Infer-Time', 4:'KNN Infer-Time', 5:'SVM Infer-Time'}, inplace=True)
 
-    fig, ax = plt.subplots()
-    df_temp.plot(ax=ax, color=['black', 'blue', 'red', 'orange', 'green'], style=[':', ':', ':', ':', ':'])
+    df_temp.plot(ax=ax[1], color=['black', 'blue', 'red', 'orange', 'green'])
+    ax[1].grid(axis='both')
+    ax[1].legend(loc='best', shadow=True, fontsize='small', facecolor='#d0d0d0')
+    ax[1].set(ylabel='Time (milliseconds)', title='Inference Time')
+
+    ## Common
+    fig.suptitle('Training & Inference Time VS Sample Size')
     plt.xlabel('Sample Size')
-    plt.ylabel('Time in milliseconds')
-    plt.title('"Letter Recognition Data Set" Inference Time VS Sample Size')
-    plt.legend(loc='best', shadow=True, fontsize='small', facecolor='#d0d0d0')
-    plt.grid(axis='both')
     fig.set_size_inches(12, 8)
-    plt.savefig("LR_infer_time.png")
+    plt.savefig("Time_performance.png")
 
 
 
