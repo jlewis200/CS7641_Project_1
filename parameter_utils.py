@@ -287,8 +287,6 @@ def get_params_ho():
 
     ### KNeighborsClassifier
     param_grid = {
-        'n_neighbors': [i for i in range(1, 13)],
-        'weights': ['uniform', 'distance'],
         'algorithm': ['ball_tree', 'kd_tree', 'brute'],
         'leaf_size': [30], #leaf size does not seem to affect accuracy.  Larger trains slightly faster
         'p': [1, 2],
@@ -338,10 +336,10 @@ def get_params_ho():
 
     ## kernel: poly
     param_grid = {
-        'C': [10**i for i in range(-5, 6)],#[i/10 for i in range(5, 81, 5)],
+        'C': [10**i for i in range(-3, 4)],#[i/10 for i in range(5, 81, 5)],
         'kernel': ['poly'],
         'degree': [1, 2, 3],
-        'gamma': [10**i for i in range(-5, 6)],#[1/i for i in range(5, 100, 5)],#['scale'],
+        'gamma': [10**i for i in range(-3, 4)],#[1/i for i in range(5, 100, 5)],#['scale'],
         'class_weight': ['balanced', None],
         'random_state': [SEED]}
 
@@ -354,7 +352,7 @@ def get_params_ho():
 
     ## kernel: linear
     param_grid = {
-        'C': np.logspace(-5, 5, 11),#[i/10 for i in range(1, 20, 1)],
+        'C': [10**i for i in range(-2, 3)],#[i/10 for i in range(1, 20, 1)],
         'kernel': ['linear'],
         'class_weight': ['balanced', None],
         'random_state': [SEED]}
