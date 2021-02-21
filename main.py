@@ -23,8 +23,6 @@ def main():
     # loaded as little as possible.
     plot_accuracy_ho()
 
-    plot_accuracy_se()
-    # plot_nnt_accuracy()
     Process(target=get_params_se).start()
     Process(target=get_params_ho).start()
     Process(target=plot_accuracy_se).start()
