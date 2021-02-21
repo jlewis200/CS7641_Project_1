@@ -199,6 +199,7 @@ def get_params_se():
     print("SVC() kernel=linear best parameters:  " + str(svm_params_linear))
     evaluate_params(SVC(**svm_params_linear), *data, True)
 
+    print("Semeion Dataset Best Parameters:\n" + str(params))
     return params
 
 def get_params_ho():
@@ -365,6 +366,7 @@ def get_params_ho():
     print("SVC() kernel=linear best parameters:  " + str(svm_params_linear))
     evaluate_params(SVC(**svm_params_linear), *data, True)
 
+    print("Holland Dataset Best Parameters:\n" + str(params))
     return params
 
 def evaluate_params(classifier, train_feat, train_class, test_feat, test_class, verbose=False):

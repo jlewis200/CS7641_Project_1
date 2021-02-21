@@ -18,19 +18,22 @@ from dataset_utils import get_normalized_data, filename_se, filename_ho, SEED
 from parameter_utils import get_params_se, get_params_ho, get_cached_params_se, get_cached_params_ho, evaluate_params
 
 def main():
+    # plot_accuracy_ho() includes a time-based test.  It should be run by itself
+    # to reduce the effect of CPU load on the results.  The system should be
+    # loaded as little as possible.
+    # plot_accuracy_ho()
 
-    # print(get_params_se())
-    # print(get_params_ho())
-    plot_accuracy_ho()
+    # Process(target=get_params_se()).start()
+    # Process(target=get_params_ho()).start()
+    Process(target=plot_accuracy_se).start()
+    Process(target=plot_dtr_accuracy).start()
+    Process(target=plot_ada_accuracy).start()
+    Process(target=plot_nnt_accuracy).start()
+    Process(target=plot_knn_accuracy).start()
+    Process(target=plot_svm_accuracy).start()
 
-    # Process(target=plot_accuracy_se()).start()
-    # Process(target=plot_dtr_accuracy()).start()
-    # Process(target=plot_ada_accuracy()).start()
-    # Process(target=plot_nnt_accuracy()).start()
-    # Process(target=plot_knn_accuracy()).start()
-    # Process(target=plot_SVM_accuracy()).start()
-
-def plot_SVM_accuracy():
+def plot_svm_accuracy():
+    print("plot_svm_accuracy")
     params = [get_cached_params_se(), get_cached_params_ho()]
 
     ratios = [i/100 for i in range(5, 100, 5)]
@@ -89,6 +92,7 @@ def plot_SVM_accuracy():
     plt.savefig("SVM_performance.png")
 
 def plot_knn_accuracy():
+    print("plot_knn_accuracy")
     params = [get_cached_params_se(), get_cached_params_ho()]
 
     data = list()
@@ -128,6 +132,7 @@ def plot_knn_accuracy():
     plt.savefig("KNN_performance.png")
 
 def plot_nnt_accuracy():
+    print("plot_nnt_accuracy")
     params = [get_cached_params_se(), get_cached_params_ho()]
 
     data = list()
@@ -184,6 +189,7 @@ def plot_nnt_accuracy():
     plt.savefig("NN_performance.png")
 
 def plot_ada_accuracy():
+    print("plot_ada_accuracy")
     params = [get_cached_params_se(), get_cached_params_ho()]
 
     data = list()
@@ -192,7 +198,7 @@ def plot_ada_accuracy():
 
     fig, ax = plt.subplots(len(data), sharex=True, sharey=True, gridspec_kw={'hspace': 0.12})
 
-    ccps = [i/10000 for i in range(0, 501, 1)]
+    ccps = [i/10000 for i in range(0, 301, 10)]
     for i in range(len(data)):
         ada_is = [] #decision tree in-sample
         ada_os = [] #decision tree out-sample
@@ -226,6 +232,7 @@ def plot_ada_accuracy():
     plt.savefig("ADA_performance.png")
 
 def plot_dtr_accuracy():
+    print("plot_dtr_accuracy")
     params = [get_cached_params_se(), get_cached_params_ho()]
 
     data = list()
@@ -234,7 +241,7 @@ def plot_dtr_accuracy():
 
     fig, ax = plt.subplots(len(data), sharex=True, gridspec_kw={'hspace': 0.12})
 
-    ccps = [i/10000 for i in range(0, 501, 1)]
+    ccps = [i/10000 for i in range(0, 301, 1)]
     for i in range(len(data)):
         dtr_is = [] #decision tree in-sample
         dtr_os = [] #decision tree out-sample
@@ -266,6 +273,7 @@ def plot_dtr_accuracy():
 
 
 def plot_accuracy_se():
+    print("plot_accuracy_se")
     params = get_cached_params_se()
 
     ratios = [i/100 for i in range(5, 100, 5)]
@@ -324,6 +332,7 @@ def plot_accuracy_se():
     plt.savefig("SE_performance.png")
 
 def plot_accuracy_ho():
+    print("plot_accuracy_ho")
     params = get_cached_params_ho()
 
     ratios = [i/100 for i in range(5, 100, 5)]
@@ -422,16 +431,13 @@ def plot_accuracy_ho():
     df_temp.plot(ax=ax[1], color=['black', 'blue', 'red', 'orange', 'green'])
     ax[1].grid(axis='both')
     ax[1].legend(loc='best', shadow=True, fontsize='small', facecolor='#d0d0d0')
-    ax[1].set(ylabel='Time (milliseconds)', title='Inference Time')
+    ax[1].set(ylabel='Time (milliseconds)', title='Infer Time')
 
     ## Common
     fig.suptitle('Training & Inference Time VS Sample Size')
     plt.xlabel('Sample Size')
     fig.set_size_inches(12, 8)
     plt.savefig("Time_performance.png")
-
-
-
 
 if "__main__" == __name__:
     main()
