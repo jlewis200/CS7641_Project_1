@@ -49,7 +49,7 @@ def get_params_se():
         'criterion': ['gini', 'entropy'],
         'random_state': [SEED]}
 
-    classifier = GridSearchCV(DecisionTreeClassifier(), param_grid, cv=2, scoring='f1_macro', n_jobs=14)
+    classifier = GridSearchCV(DecisionTreeClassifier(), param_grid, cv=2, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
     dtr_params = classifier.best_params_
     params['dtr_params'] = dtr_params
@@ -67,7 +67,7 @@ def get_params_se():
         'algorithm': ['SAMME', 'SAMME.R'],
         'random_state': [SEED]}
 
-    classifier = GridSearchCV(AdaBoostClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=14)
+    classifier = GridSearchCV(AdaBoostClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
     ada_params = classifier.best_params_
     params['ada_params'] = ada_params
@@ -83,7 +83,7 @@ def get_params_se():
         'max_iter': [200],
         'random_state': [SEED]}
 
-    classifier = GridSearchCV(MLPClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=14)
+    classifier = GridSearchCV(MLPClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
     nnt_params_adm = classifier.best_params_
     params['nnt_params_adm'] = nnt_params_adm
@@ -98,7 +98,7 @@ def get_params_se():
         'max_iter': [200],
         'random_state': [SEED]}
 
-    classifier = GridSearchCV(MLPClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=14)
+    classifier = GridSearchCV(MLPClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
     nnt_params_lbfgs = classifier.best_params_
     params['nnt_params_lbfgs'] = nnt_params_lbfgs
@@ -114,7 +114,7 @@ def get_params_se():
         'max_iter': [200],
         'random_state': [SEED]}
 
-    classifier = GridSearchCV(MLPClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=14)
+    classifier = GridSearchCV(MLPClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
     nnt_params_sgd = classifier.best_params_
     params['nnt_params_sgd'] = nnt_params_sgd
@@ -130,7 +130,7 @@ def get_params_se():
         'p': [1, 2],
         'n_jobs': [14]}
 
-    classifier = GridSearchCV(KNeighborsClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=14)
+    classifier = GridSearchCV(KNeighborsClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
     knn_params = classifier.best_params_
     params['knn_params'] = knn_params
@@ -146,7 +146,7 @@ def get_params_se():
         'class_weight': ['balanced', None],
         'random_state': [SEED]}
 
-    classifier = GridSearchCV(SVC(), param_grid, cv=5, scoring='f1_macro', n_jobs=14)
+    classifier = GridSearchCV(SVC(), param_grid, cv=5, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
     svm_params_rbf = classifier.best_params_
     params['svm_params_rbf'] = svm_params_rbf
@@ -161,7 +161,7 @@ def get_params_se():
         'class_weight': ['balanced', None],
         'random_state': [SEED]}
 
-    classifier = GridSearchCV(SVC(), param_grid, cv=5, scoring='f1_macro', n_jobs=14)
+    classifier = GridSearchCV(SVC(), param_grid, cv=5, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
     svm_params_sigmoid = classifier.best_params_
     params['svm_params_sigmoid'] = svm_params_sigmoid
@@ -177,7 +177,7 @@ def get_params_se():
         'class_weight': ['balanced', None],
         'random_state': [SEED]}
 
-    classifier = GridSearchCV(SVC(), param_grid, cv=5, scoring='f1_macro', n_jobs=14)
+    classifier = GridSearchCV(SVC(), param_grid, cv=5, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
     svm_params_poly = classifier.best_params_
     params['svm_params_poly'] = svm_params_poly
@@ -191,7 +191,7 @@ def get_params_se():
         'class_weight': ['balanced', None],
         'random_state': [SEED]}
 
-    classifier = GridSearchCV(SVC(), param_grid, cv=5, scoring='f1_macro', n_jobs=14)
+    classifier = GridSearchCV(SVC(), param_grid, cv=5, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
     svm_params_linear = classifier.best_params_
     params['svm_params_linear'] = svm_params_linear
@@ -213,7 +213,7 @@ def get_params_ho():
         'criterion': ['gini', 'entropy'],
         'random_state': [SEED]}
 
-    classifier = GridSearchCV(DecisionTreeClassifier(), param_grid, cv=2, scoring='f1_macro', n_jobs=14)
+    classifier = GridSearchCV(DecisionTreeClassifier(), param_grid, cv=2, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
     dtr_params = classifier.best_params_
     params['dtr_params'] = dtr_params
@@ -231,7 +231,7 @@ def get_params_ho():
         'algorithm': ['SAMME', 'SAMME.R'],
         'random_state': [SEED]}
 
-    classifier = GridSearchCV(AdaBoostClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=14)
+    classifier = GridSearchCV(AdaBoostClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
     ada_params = classifier.best_params_
     params['ada_params'] = ada_params
@@ -247,7 +247,7 @@ def get_params_ho():
         'max_iter': [200],
         'random_state': [SEED]}
 
-    classifier = GridSearchCV(MLPClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=14)
+    classifier = GridSearchCV(MLPClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
     nnt_params_adm = classifier.best_params_
     params['nnt_params_adm'] = nnt_params_adm
@@ -262,7 +262,7 @@ def get_params_ho():
         'max_iter': [200],
         'random_state': [SEED]}
 
-    classifier = GridSearchCV(MLPClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=14)
+    classifier = GridSearchCV(MLPClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
     nnt_params_lbfgs = classifier.best_params_
     params['nnt_params_lbfgs'] = nnt_params_lbfgs
@@ -278,7 +278,7 @@ def get_params_ho():
         'max_iter': [200],
         'random_state': [SEED]}
 
-    classifier = GridSearchCV(MLPClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=14)
+    classifier = GridSearchCV(MLPClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
     nnt_params_sgd = classifier.best_params_
     params['nnt_params_sgd'] = nnt_params_sgd
@@ -294,7 +294,7 @@ def get_params_ho():
         'p': [1, 2],
         'n_jobs': [14]}
 
-    classifier = GridSearchCV(KNeighborsClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=14)
+    classifier = GridSearchCV(KNeighborsClassifier(), param_grid, cv=5, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
     knn_params = classifier.best_params_
     params['knn_params'] = knn_params
@@ -312,7 +312,7 @@ def get_params_ho():
         'class_weight': ['balanced', None],
         'random_state': [SEED]}
 
-    classifier = GridSearchCV(SVC(), param_grid, cv=5, scoring='f1_macro', n_jobs=14)
+    classifier = GridSearchCV(SVC(), param_grid, cv=5, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
     svm_params_rbf = classifier.best_params_
     params['svm_params_rbf'] = svm_params_rbf
@@ -329,7 +329,7 @@ def get_params_ho():
         'class_weight': ['balanced', None],
         'random_state': [SEED]}
 
-    classifier = GridSearchCV(SVC(), param_grid, cv=5, scoring='f1_macro', n_jobs=14)
+    classifier = GridSearchCV(SVC(), param_grid, cv=5, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
     svm_params_sigmoid = classifier.best_params_
     params['svm_params_sigmoid'] = svm_params_sigmoid
@@ -345,7 +345,7 @@ def get_params_ho():
         'class_weight': ['balanced', None],
         'random_state': [SEED]}
 
-    classifier = GridSearchCV(SVC(), param_grid, cv=5, scoring='f1_macro', n_jobs=14)
+    classifier = GridSearchCV(SVC(), param_grid, cv=5, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
     svm_params_poly = classifier.best_params_
     params['svm_params_poly'] = svm_params_poly
@@ -359,7 +359,7 @@ def get_params_ho():
         'class_weight': ['balanced', None],
         'random_state': [SEED]}
 
-    classifier = GridSearchCV(SVC(), param_grid, cv=5, scoring='f1_macro', n_jobs=14)
+    classifier = GridSearchCV(SVC(), param_grid, cv=5, scoring='f1_macro', n_jobs=192)
     classifier.fit(train_feat, train_class)
     svm_params_linear = classifier.best_params_
     params['svm_params_linear'] = svm_params_linear
