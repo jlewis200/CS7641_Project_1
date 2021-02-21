@@ -18,7 +18,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import cross_val_score
 from sklearn import datasets
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, accuracy_score
 
 from sklearn.exceptions import ConvergenceWarning
 #local project packages
@@ -369,7 +369,7 @@ def get_params_ho():
     print("Holland Dataset Best Parameters:\n" + str(params))
     return params
 
-def evaluate_params(classifier, train_feat, train_class, test_feat, test_class, verbose=False):
+def evaluate_params(classifier, train_feat, train_class, test_feat, test_class, verbose=False, metric=f1_score):
     train_time = int(time() * 1000) #milliseconds
     classifier.fit(train_feat, train_class)
     train_time = int(time() * 1000) - train_time
@@ -380,9 +380,16 @@ def evaluate_params(classifier, train_feat, train_class, test_feat, test_class, 
 
     test_pred = classifier.predict(test_feat)
 
-    train_score = f1_score(train_class, train_pred, average=None)
+    if metric == f1_score:
+        train_score = metric(train_class, train_pred, average=None)
+    else:
+        train_score = metric(train_class, train_pred)
     train_score_mean = train_score.mean()
-    test_score = f1_score(test_class, test_pred, average=None)
+
+    if metric == f1_score:
+        test_score = metric(test_class, test_pred, average=None)
+    else:
+        test_score = metric(test_class, test_pred)
     test_score_mean = test_score.mean()
 
     if verbose:

@@ -10,7 +10,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, accuracy_score
 from multiprocessing import Process
 
 #local project packages
@@ -26,14 +26,14 @@ def main():
     Process(target=get_params_se).start()
     Process(target=get_params_ho).start()
     Process(target=plot_accuracy_se).start()
-    Process(target=plot_dtr_accuracy).start()
-    Process(target=plot_ada_accuracy).start()
-    Process(target=plot_nnt_accuracy).start()
-    Process(target=plot_knn_accuracy).start()
-    Process(target=plot_svm_accuracy).start()
+    Process(target=plot_dtr_f1).start()
+    Process(target=plot_ada_f1).start()
+    Process(target=plot_nnt_f1).start()
+    Process(target=plot_knn_f1).start()
+    Process(target=plot_svm_f1).start()
 
-def plot_svm_accuracy():
-    print("plot_svm_accuracy")
+def plot_svm_f1():
+    print("plot_svm_f1")
     params = [get_cached_params_se(), get_cached_params_ho()]
 
     ratios = [i/100 for i in range(5, 100, 5)]
@@ -91,8 +91,8 @@ def plot_svm_accuracy():
     fig.set_size_inches(12, 8)
     plt.savefig("SVM_performance.png")
 
-def plot_knn_accuracy():
-    print("plot_knn_accuracy")
+def plot_knn_f1():
+    print("plot_knn_f1")
     params = [get_cached_params_se(), get_cached_params_ho()]
 
     data = list()
@@ -131,8 +131,8 @@ def plot_knn_accuracy():
     fig.set_size_inches(12, 8)
     plt.savefig("KNN_performance.png")
 
-def plot_nnt_accuracy():
-    print("plot_nnt_accuracy")
+def plot_nnt_f1():
+    print("plot_nnt_f1")
     params = [get_cached_params_se(), get_cached_params_ho()]
 
     data = list()
@@ -188,8 +188,8 @@ def plot_nnt_accuracy():
     fig.set_size_inches(12, 8)
     plt.savefig("NN_performance.png")
 
-def plot_ada_accuracy():
-    print("plot_ada_accuracy")
+def plot_ada_f1():
+    print("plot_ada_f1")
     params = [get_cached_params_se(), get_cached_params_ho()]
 
     data = list()
@@ -231,8 +231,8 @@ def plot_ada_accuracy():
     fig.set_size_inches(12, 8)
     plt.savefig("ADA_performance.png")
 
-def plot_dtr_accuracy():
-    print("plot_dtr_accuracy")
+def plot_dtr_f1():
+    print("plot_dtr_f1")
     params = [get_cached_params_se(), get_cached_params_ho()]
 
     data = list()
@@ -296,23 +296,23 @@ def plot_accuracy_se():
         data = get_normalized_data(filename_se, ratio)
         n_samples.append(data[0].shape[0])
 
-        res = evaluate_params(DecisionTreeClassifier(**params['dtr_params']), *data)
+        res = evaluate_params(DecisionTreeClassifier(**params['dtr_params']), *data, metric=accuracy_score)
         dtr_is.append(res[1])
         dtr_os.append(res[3])
 
-        res = evaluate_params(AdaBoostClassifier(**params['ada_params']), *data)
+        res = evaluate_params(AdaBoostClassifier(**params['ada_params']), *data, metric=accuracy_score)
         ada_is.append(res[1])
         ada_os.append(res[3])
 
-        res = evaluate_params(MLPClassifier(**params['nnt_params_lbfgs']), *data)
+        res = evaluate_params(MLPClassifier(**params['nnt_params_lbfgs']), *data, metric=accuracy_score)
         nnt_is.append(res[1])
         nnt_os.append(res[3])
 
-        res = evaluate_params(KNeighborsClassifier(**params['knn_params']), *data)
+        res = evaluate_params(KNeighborsClassifier(**params['knn_params']), *data, metric=accuracy_score)
         knn_is.append(res[1])
         knn_os.append(res[3])
 
-        res = evaluate_params(SVC(**params['svm_params_rbf']), *data)
+        res = evaluate_params(SVC(**params['svm_params_rbf']), *data, metric=accuracy_score)
         svm_is.append(res[1])
         svm_os.append(res[3])
 
@@ -324,7 +324,7 @@ def plot_accuracy_se():
     fig, ax = plt.subplots()
     df_temp.plot(ax=ax, color=['black', 'blue', 'red', 'orange', 'green', 'black', 'blue', 'red', 'orange', 'green'], style=['-', '-', '-', '-', '-', ':', ':', ':', ':', ':'])
     plt.xlabel('Train/Test Ratio')
-    plt.ylabel('Mean F1 Score')
+    plt.ylabel('Mean Accuracy Score')
     plt.title('Model Performance VS Train/Test Ratio Over Semeion Dataset')
     plt.legend(loc='best', shadow=True, fontsize='small', facecolor='#d0d0d0')
     plt.grid(axis='both')
@@ -365,31 +365,31 @@ def plot_accuracy_ho():
         data = get_normalized_data(filename_ho, ratio)
         n_samples.append(data[0].shape[0])
 
-        res = evaluate_params(DecisionTreeClassifier(**params['dtr_params']), *data)
+        res = evaluate_params(DecisionTreeClassifier(**params['dtr_params']), *data, metric=accuracy_score)
         dtr_is.append(res[1])
         dtr_os.append(res[3])
         dtr_tt.append(res[4])
         dtr_it.append(res[5])
 
-        res = evaluate_params(AdaBoostClassifier(**params['ada_params']), *data)
+        res = evaluate_params(AdaBoostClassifier(**params['ada_params']), *data, metric=accuracy_score)
         ada_is.append(res[1])
         ada_os.append(res[3])
         ada_tt.append(res[4])
         ada_it.append(res[5])
 
-        res = evaluate_params(MLPClassifier(**params['nnt_params_lbfgs']), *data)
+        res = evaluate_params(MLPClassifier(**params['nnt_params_lbfgs']), *data, metric=accuracy_score)
         nnt_is.append(res[1])
         nnt_os.append(res[3])
         nnt_tt.append(res[4])
         nnt_it.append(res[5])
 
-        res = evaluate_params(KNeighborsClassifier(**params['knn_params']), *data)
+        res = evaluate_params(KNeighborsClassifier(**params['knn_params']), *data, metric=accuracy_score)
         knn_is.append(res[1])
         knn_os.append(res[3])
         knn_tt.append(res[4])
         knn_it.append(res[5])
 
-        res = evaluate_params(SVC(**params['svm_params_rbf']), *data)
+        res = evaluate_params(SVC(**params['svm_params_rbf']), *data, metric=accuracy_score)
         svm_is.append(res[1])
         svm_os.append(res[3])
         svm_tt.append(res[4])
@@ -403,7 +403,7 @@ def plot_accuracy_ho():
     fig, ax = plt.subplots()
     df_temp.plot(ax=ax, color=['black', 'blue', 'red', 'orange', 'green', 'black', 'blue', 'red', 'orange', 'green'], style=['-', '-', '-', '-', '-', ':', ':', ':', ':', ':'])
     plt.xlabel('Train/Test Ratio')
-    plt.ylabel('Mean F1 Score')
+    plt.ylabel('Mean Accuracy Score')
     plt.title('Model Performance VS Train/Test Ratio Over Holland Dataset')
     plt.legend(loc='best', shadow=True, fontsize='small', facecolor='#d0d0d0')
     plt.grid(axis='both')
