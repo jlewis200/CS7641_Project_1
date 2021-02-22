@@ -1,6 +1,12 @@
 github repository:
 https://github.com/jlewis200/CS7641_Project_1
 
+clone with:
+git clone https://github.com/jlewis200/CS7641_Project_1
+
+navigate to folder:
+cd CS7641_Project_1
+
 run with:
 ./main.py
 
