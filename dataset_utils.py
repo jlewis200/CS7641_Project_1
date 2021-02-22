@@ -16,7 +16,7 @@ data_se = None
 data_ho = None
 
 def get_raw_data_se(train_ratio):
-    #get the raw Semeion data split into train/test feature vectore/classification
+    #get the raw Semeion data split into train/test feature vector/classification
     global data_se
 
     #Only load the data if it has not been loaded previously

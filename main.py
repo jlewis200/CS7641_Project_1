@@ -20,7 +20,7 @@ from parameter_utils import get_params_se, get_params_ho, get_cached_params_se, 
 def main():
     # plot_accuracy_ho() includes a time-based test.  It should be run by itself
     # to reduce the effect of CPU load on the results.  The system should be
-    # loaded as little as possible.
+    # loaded as little as possible to reduce noise in the data.
     plot_accuracy_ho()
 
     Process(target=get_params_se).start()
@@ -324,7 +324,7 @@ def plot_accuracy_se():
     fig, ax = plt.subplots()
     df_temp.plot(ax=ax, color=['black', 'blue', 'red', 'orange', 'green', 'black', 'blue', 'red', 'orange', 'green'], style=['-', '-', '-', '-', '-', ':', ':', ':', ':', ':'])
     plt.xlabel('Train/Test Ratio')
-    plt.ylabel('Mean Accuracy Score')
+    plt.ylabel('Mean Accuracy')
     plt.title('Model Performance VS Train/Test Ratio Over Semeion Dataset')
     plt.legend(loc='best', shadow=True, fontsize='small', facecolor='#d0d0d0')
     plt.grid(axis='both')
@@ -403,7 +403,7 @@ def plot_accuracy_ho():
     fig, ax = plt.subplots()
     df_temp.plot(ax=ax, color=['black', 'blue', 'red', 'orange', 'green', 'black', 'blue', 'red', 'orange', 'green'], style=['-', '-', '-', '-', '-', ':', ':', ':', ':', ':'])
     plt.xlabel('Train/Test Ratio')
-    plt.ylabel('Mean Accuracy Score')
+    plt.ylabel('Mean Accuracy')
     plt.title('Model Performance VS Train/Test Ratio Over Holland Dataset')
     plt.legend(loc='best', shadow=True, fontsize='small', facecolor='#d0d0d0')
     plt.grid(axis='both')

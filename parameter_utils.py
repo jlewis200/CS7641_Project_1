@@ -304,11 +304,9 @@ def get_params_ho():
     ### SVC
     ## kernel: rbf
     param_grid = {
-        # 'C': [i/10 for i in range(5, 81, 5)],
         'C': [10**i for i in range(-5, 6)],
         'kernel': ['rbf'],
-        # 'gamma': [1/i for i in range(2, 17)],#['scale'],
-        'gamma': [10**i for i in range(-5, 6)],#['scale'],
+        'gamma': [10**i for i in range(-5, 6)],
         'class_weight': ['balanced', None],
         'random_state': [SEED]}
 
@@ -321,11 +319,9 @@ def get_params_ho():
 
     ## kernel: sigmoid
     param_grid = {
-        # 'C': [i/10 for i in range(30, 41, 1)],
         'C': [10**i for i in range(-5, 6)],
         'kernel': ['sigmoid'],
-        # 'gamma': [1/i for i in range(68, 76, 1)],#['scale'],
-        'gamma': [10**i for i in range(-5, 6)],#['scale'],
+        'gamma': [10**i for i in range(-5, 6)],
         'class_weight': ['balanced', None],
         'random_state': [SEED]}
 
@@ -341,7 +337,7 @@ def get_params_ho():
         'C': [i/10 for i in range(5, 81, 5)],
         'kernel': ['poly'],
         'degree': [1],
-        'gamma': [1/i for i in range(5, 100, 5)],#['scale'],
+        'gamma': [1/i for i in range(5, 100, 5)],
         'class_weight': ['balanced', None],
         'random_state': [SEED]}
 
@@ -354,7 +350,7 @@ def get_params_ho():
 
     ## kernel: linear
     param_grid = {
-        'C': [10**i for i in range(-2, 3)],#[i/10 for i in range(1, 20, 1)],
+        'C': [10**i for i in range(-2, 3)],
         'kernel': ['linear'],
         'class_weight': ['balanced', None],
         'random_state': [SEED]}

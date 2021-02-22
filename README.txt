@@ -7,7 +7,7 @@ run with:
 depends on:
 matplotlib, sklearn, numpy, pandas, multiprocessing
 
-main.py - This is the main entry point for the program.  It provides the best parameters for each classifier, and classifier-kernel/classifier-solver combination when comparisons are made.  It also contains the main plot-producing functions.  The plots are saved to *.png files directly.  Runtime is approximately 30 minutes on a 96 core Amazon Web Services c5a.24xlarge.
+main.py - This is the main entry point for the program.  It provides the best parameters for each classifier-dataset combination, and classifier-kernel-dataset or classifier-solver-dataset combination where appropriate.  It also contains the main plot-producing functions.  The plots are saved to *.png files directly.  Runtime is approximately 30 minutes on a 96 core Amazon Web Services c5a.24xlarge, and 120 minutes on a 4 core/8 thrad i7-6700HQ equipped laptop.
 
 parameter_utils.py - This file contains the supporting code to cross validate the models with a variety of different parameters.  The main functions are get_params_[DATASET]().  This returns a dictionary of dictionaries, each of which contains the best parameters (among those tested) for a given model.  These can be passed to the classifier constructor directly by using the ** unpacking operator. Example use:
     params = get_params_se()
